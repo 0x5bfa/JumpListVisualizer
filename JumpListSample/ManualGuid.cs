@@ -64,6 +64,9 @@ namespace Windows.Win32
 		[GuidRVAGen.Guid("6332DEBF-87B5-4670-90C0-5E57B408A49E")]
 		public static partial Guid* IID_ICustomDestinationList { get; }
 
+		[GuidRVAGen.Guid("507101CD-F6AD-46C8-8E20-EEB9E6BAC47F")]
+		public static partial Guid* IID_ICustomDestinationList2 { get; }
+
 		[GuidRVAGen.Guid("92CA9DCD-5622-4BBA-A805-5E9F541BD8C9")]
 		public static partial Guid* IID_IObjectArray { get; }
 	}
@@ -98,7 +101,7 @@ namespace Windows.Win32
 		public static partial Guid* CLSID_AutomaticDestinationList { get; }
 
 		[GuidRVAGen.Guid("77F10CF0-3DB5-4966-B520-B7C54FD35ED6")]
-		public static partial Guid* CLSID_CustomDestinationList { get; } // Probably has to be CLSID_DestinationList, but for the sake of clear understanding, it remains as is.
+		public static partial Guid* CLSID_DestinationList { get; } // Probably has to be CLSID_DestinationList, but for the sake of clear understanding, it remains as is.
 	}
 
 	public static unsafe partial class BHID

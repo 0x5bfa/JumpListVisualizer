@@ -15,8 +15,6 @@ namespace JumpListSample
 {
 	public unsafe partial class JumpListManager : IDisposable
 	{
-		string _appId = null!;
-
 		IAutomaticDestinationList* _autoDestListPtr = default;
 		ICustomDestinationList* _customDestListPtr = default;
 		ICustomDestinationList2* _customDestList2Ptr = default;
@@ -25,19 +23,22 @@ namespace JumpListSample
 		{
 			HRESULT hr = default;
 
-			IAutomaticDestinationList* ptr = default;
+			IAutomaticDestinationList* autoDestListPtr = default;
+			ICustomDestinationList* customDestListPtr = default;
+			ICustomDestinationList2* customDestList2Ptr = default;
 
-			PInvoke.CoCreateInstance(
-				CLSID.CLSID_AutomaticDestinationList,
-				null,
-				CLSCTX.CLSCTX_INPROC_SERVER,
-				IID.IID_IAutomaticDestinationList,
-				(void**)&ptr);
+			hr = PInvoke.CoCreateInstance(CLSID.CLSID_AutomaticDestinationList, null, CLSCTX.CLSCTX_INPROC_SERVER, IID.IID_IAutomaticDestinationList, (void**)&autoDestListPtr);
+			hr = PInvoke.CoCreateInstance(CLSID.CLSID_DestinationList, null, CLSCTX.CLSCTX_INPROC_SERVER, IID.IID_ICustomDestinationList, (void**)&customDestListPtr);
+			hr = PInvoke.CoCreateInstance(CLSID.CLSID_DestinationList, null, CLSCTX.CLSCTX_INPROC_SERVER, IID.IID_ICustomDestinationList2, (void**)&customDestList2Ptr);
 
 			fixed (char* pszAppId = szAppId)
-				hr = ptr->Initialize(pszAppId, default, default);
+			{
+				hr = autoDestListPtr->Initialize(pszAppId, default, default);
+				hr = customDestListPtr->SetAppID(pszAppId);
+				hr = customDestList2Ptr->SetApplicationID(pszAppId);
+			}
 
-			return ptr is null ? null : new() { _autoDestListPtr = ptr, _appId = szAppId };
+			return /*hr.Failed ? null : */new() { _autoDestListPtr = autoDestListPtr, _customDestListPtr = customDestListPtr, _customDestList2Ptr = customDestList2Ptr };
 		}
 
 		public bool HasListOf(DESTLISTTYPE type)
@@ -105,22 +106,21 @@ namespace JumpListSample
 		public IEnumerable<JumpListItem> EnumerateCustomDestinations()
 		{
 			HRESULT hr = default;
-			using ComPtr<ICustomDestinationList> pCDL = default;
-			using ComPtr<IObjectArray> pOA = default;
-			uint dwSlotCount = 0U;
-			uint dwArrayCount = 0U;
 
-			hr = PInvoke.CoCreateInstance(CLSID.CLSID_CustomDestinationList, null, CLSCTX.CLSCTX_INPROC_SERVER, IID.IID_ICustomDestinationList, (void**)pCDL.GetAddressOf());
-			hr = pCDL.Get()->SetAppID(_appId);
-			hr = pCDL.Get()->BeginList(&dwSlotCount, IID.IID_IObjectArray, (void**)pOA.GetAddressOf());
-			hr = pOA.Get()->GetCount(&dwArrayCount);
+			Guid IID_IObjectCollection = IObjectCollection.IID_Guid;
+			using ComPtr<IObjectCollection> pObjectCollection = default;
 
-			for (uint dwIndex = 0U; dwIndex < dwArrayCount; dwIndex++)
+			return [];
+
+			hr = _customDestList2Ptr->EnumerateCategoryDestinations(0, &IID_IObjectCollection, (void**)pObjectCollection.GetAddressOf());
+			hr = pObjectCollection.Get()->GetCount(out uint pcObjects);
+
+			for (uint dwIndex = 0U; dwIndex < pcObjects; dwIndex++)
 			{
 				using ComPtr<IShellItem> pShellItem = default;
 				PWSTR pszName = default;
 
-				hr = pOA.Get()->GetAt(dwIndex, IID.IID_IShellItem, (void**)pShellItem.GetAddressOf());
+				hr = pObjectCollection.Get()->GetAt(dwIndex, IID.IID_IShellItem, (void**)pShellItem.GetAddressOf());
 				hr = pShellItem.Get()->GetDisplayName(SIGDN.SIGDN_NORMALDISPLAY, &pszName);
 
 				System.Diagnostics.Debug.WriteLine($"Idx {dwIndex}: {pszName}");
