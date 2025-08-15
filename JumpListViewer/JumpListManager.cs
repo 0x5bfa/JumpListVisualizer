@@ -47,7 +47,7 @@ namespace JumpListViewer
 			return new() { _autoDestListPtr = autoDestListPtr, _customDestListPtr = customDestListPtr, _customDestList2Ptr = customDestList2Ptr };
 		}
 
-		public bool HasListOf(DESTLISTTYPE type)
+		public bool HasAutomaticDestinationsOf(DESTLISTTYPE type)
 		{
 			HRESULT hr = default;
 

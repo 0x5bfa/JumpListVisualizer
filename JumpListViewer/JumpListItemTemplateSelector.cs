@@ -15,11 +15,11 @@ namespace JumpListViewer
 
 		protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
 		{
-			if (item is JumpListSectionItem jumpListSectionItem)
+			if (item is JumpListSectionItem)
 			{
 				return SectionItem;
 			}
-			else if (item is JumpListItem jumpListItem)
+			else if (item is JumpListItem)
 			{
 				return Item;
 			}

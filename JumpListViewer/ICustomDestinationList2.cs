@@ -18,43 +18,53 @@ namespace JumpListViewer
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT SetMinItems(uint dwMinItems)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, int>)lpVtbl[3])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), dwMinItems);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, int>)lpVtbl[3])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), dwMinItems);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT SetApplicationID(PCWSTR pszAppID)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, PCWSTR, int>)lpVtbl[4])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), pszAppID);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, PCWSTR, int>)lpVtbl[4])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), pszAppID);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT GetSlotCount(uint* pdwSlotCount)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint*, int>)lpVtbl[5])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), pdwSlotCount);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint*, int>)lpVtbl[5])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), pdwSlotCount);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT GetCategoryCount(uint* pdwCategoryCount)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint*, int>)lpVtbl[6])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), pdwCategoryCount);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint*, int>)lpVtbl[6])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), pdwCategoryCount);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT GetCategory(uint a1, GETCATFLAG dwFlags, APPDESTCATEGORY* pADC)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, GETCATFLAG, APPDESTCATEGORY*, int>)lpVtbl[7])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), a1, dwFlags, pADC);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, GETCATFLAG, APPDESTCATEGORY*, int>)lpVtbl[7])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), a1, dwFlags, pADC);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT DeleteCategory(uint a1, int a2)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[8])((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[8])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT EnumerateCategoryDestinations(uint a1, Guid* a2, void** ppvObject)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, Guid*, void**, int>)lpVtbl[9])((ICustomDestinationList2*)Unsafe.AsPointer(ref this), a1, a2, ppvObject);
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, uint, Guid*, void**, int>)lpVtbl[9])(
+				(ICustomDestinationList2*)Unsafe.AsPointer(ref this), a1, a2, ppvObject);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT RemoveDestination(IUnknown* a1)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[10])((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[10])
+			((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT HasListEx(int* a1, int* a2)
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[11])((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[11])
+			((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT ClearRemovedDestinations()
-			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[12])((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<ICustomDestinationList2*, int>)lpVtbl[12])
+			((ICustomDestinationList2*)Unsafe.AsPointer(ref this));
 	}
 
 	[StructLayout(LayoutKind.Sequential)]

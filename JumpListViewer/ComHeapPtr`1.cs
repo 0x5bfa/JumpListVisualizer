@@ -14,8 +14,11 @@ namespace Windows.Win32
 	{
 		private T* _ptr;
 
-		public bool IsNull
-			=> _ptr == null;
+		public readonly bool IsNull
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => _ptr is null;
+		}
 
 		public ComHeapPtr(T* ptr)
 		{

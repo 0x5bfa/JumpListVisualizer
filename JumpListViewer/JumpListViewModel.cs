@@ -29,7 +29,7 @@ namespace JumpListViewer
 			if (string.IsNullOrEmpty(AppId) || JumpListManager.Initialize(AppId) is not { } manager)
 				return;
 
-			if (manager.HasListOf(DESTLISTTYPE.PINNED))
+			if (manager.HasAutomaticDestinationsOf(DESTLISTTYPE.PINNED))
 			{
 				JumpListItems.Add(new JumpListSectionItem() { Text = "Pinned" });
 				foreach (var item in manager.EnumerateAutomaticDestinations(DESTLISTTYPE.PINNED))
@@ -38,12 +38,12 @@ namespace JumpListViewer
 				}
 			}
 
-			if (manager.HasListOf(DESTLISTTYPE.RECENT))
+			if (manager.HasAutomaticDestinationsOf(DESTLISTTYPE.RECENT))
 			{
 				JumpListItems.Add(new JumpListSectionItem() { Text = "Recent" });
 				foreach (var item in manager.EnumerateAutomaticDestinations(DESTLISTTYPE.RECENT))
 				{
-					if (JumpListItems.Where(x => x.IsPinned).Where(x => x.Text == item.Text).Any())
+					if (JumpListItems.OfType<JumpListItem>().Where(x => x.IsPinned).Where(x => x.Text == item.Text).Any())
 						continue;
 					JumpListItems.Add(item);
 				}

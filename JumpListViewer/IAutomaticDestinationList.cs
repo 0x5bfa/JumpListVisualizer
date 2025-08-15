@@ -17,45 +17,33 @@ namespace JumpListViewer
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT Initialize(PCWSTR szAppId, PCWSTR a2, PCWSTR a3)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, PCWSTR, PCWSTR, PCWSTR, int>)lpVtbl[3])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, PCWSTR, PCWSTR, PCWSTR, int>)lpVtbl[3])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), szAppId, a2, a3);
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT HasList(BOOL* pfHasList)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, BOOL*, int>)lpVtbl[4])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, BOOL*, int>)lpVtbl[4])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), pfHasList);
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT GetList(DESTLISTTYPE dwListType, int iMaxCount, GETDESTLISTFLAGS dwFlags, Guid* riid, void** ppvObject)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, DESTLISTTYPE, int, GETDESTLISTFLAGS, Guid*, void**, int>)lpVtbl[5])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, DESTLISTTYPE, int, GETDESTLISTFLAGS, Guid*, void**, int>)lpVtbl[5])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), dwListType, iMaxCount, dwFlags, riid, ppvObject);
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT AddUsagePoint(IUnknown* pItem)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, int>)lpVtbl[6])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, int>)lpVtbl[6])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), pItem);
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT PinItem(IUnknown* pItem, int iPinIndex)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, int>)lpVtbl[6])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, int>)lpVtbl[7])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), pItem);
-		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public HRESULT IsPinned(IUnknown* pObj, BOOL* fIsPinned)
-		{
-			return (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, BOOL*, int>)lpVtbl[8])
+			=> (HRESULT)((delegate* unmanaged[MemberFunction]<IAutomaticDestinationList*, IUnknown*, BOOL*, int>)lpVtbl[8])
 				((IAutomaticDestinationList*)Unsafe.AsPointer(ref this), pObj, fIsPinned);
-		}
 
 		[GuidRVAGen.Guid("E9C5EF8D-FD41-4F72-BA87-EB03BAD5817C")]
 		public static partial ref readonly Guid Guid { get; }
