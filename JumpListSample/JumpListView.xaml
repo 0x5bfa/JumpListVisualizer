@@ -21,7 +21,7 @@
 			SectionItem="{StaticResource JumpListSectionItemTemplate}" />
 
 		<DataTemplate x:Key="JumpListSectionItemTemplate" x:DataType="local:JumpListSectionItem">
-			<Grid ColumnSpacing="8">
+			<Grid Margin="12,7,12,6" ColumnSpacing="8">
 				<TextBlock
 					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 					Style="{StaticResource CaptionTextBlockStyle}"
@@ -32,7 +32,7 @@
 		</DataTemplate>
 
 		<DataTemplate x:Key="JumpListItemTemplate" x:DataType="local:JumpListItem">
-			<Grid>
+			<Grid Margin="12,7,24,6">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="16" />
 					<ColumnDefinition Width="*" />
@@ -84,12 +84,7 @@
 			BorderThickness="1"
 			CornerRadius="{StaticResource OverlayCornerRadius}">
 
-			<ListView
-				x:Name="JumpListCollectionView"
-				IsItemClickEnabled="False"
-				ItemTemplateSelector="{StaticResource JumpListItemTemplateSelector}"
-				ItemsSource="{x:Bind ViewModel.JumpListItems, Mode=OneWay}"
-				SelectionMode="Single" />
+			<ItemsControl ItemTemplateSelector="{StaticResource JumpListItemTemplateSelector}" ItemsSource="{x:Bind ViewModel.JumpListItems, Mode=OneWay}" />
 
 		</ScrollView>
 

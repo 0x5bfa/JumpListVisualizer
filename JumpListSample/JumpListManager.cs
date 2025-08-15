@@ -160,26 +160,16 @@ namespace JumpListSample
 			{
 				hr = pObj->QueryInterface(IID.IID_IShellLinkW, (void**)pShellLink.GetAddressOf()).ThrowOnFailure();
 
-				char* pwszName = (char*)NativeMemory.AllocZeroed(256);
+				using ComPtr<IPropertyStore> pPropertyStore = default;
+				PROPERTYKEY pKey = PInvoke.PKEY_Title;
+				PROPVARIANT pVar = default;
 
-				try
-				{
-					using ComPtr<IPropertyStore> pPropertyStore = default;
-					PROPERTYKEY pKey = PInvoke.PKEY_Title;
-					PROPVARIANT pVar = default;
+				pShellLink.Get()->QueryInterface(IID.IID_IPropertyStore, (void**)pPropertyStore.GetAddressOf());
+				hr = pPropertyStore.Get()->GetValue(&pKey, &pVar);
 
-					// Get the display name (explorer.exe!DestinationList::_CreateFullListItem)
-					pShellLink.Get()->QueryInterface(IID.IID_IPropertyStore, (void**)pPropertyStore.GetAddressOf());
-					hr = pPropertyStore.Get()->GetValue(&pKey, &pVar);
+				var bitmapImage = ThumbnailHelper.GetThumbnail(pShellLink.Get())?.ToBitmap();
 
-					BitmapImage? bitmapImage = ThumbnailHelper.GetThumbnail(pShellLink.Get())?.ToBitmap();
-
-					return new() { Icon = bitmapImage, Text = new string(pVar.Anonymous.Anonymous.Anonymous.pwszVal), IsPinned = pfIsPinned };
-				}
-				finally
-				{
-					NativeMemory.Free(pwszName);
-				}
+				return new() { Icon = bitmapImage, Text = new string(pVar.Anonymous.Anonymous.Anonymous.pwszVal), IsPinned = pfIsPinned };
 			}
 		}
 
