@@ -19,10 +19,8 @@ namespace JumpListSample
 	{
 		private static (Guid Format, Guid Encorder)[]? GdiEncoders;
 
-		public static byte[] GetThumbnail(IShellItem* pShellItem, int size = 32)
+		public static byte[]? GetThumbnail(IShellItem* pShellItem, int size = 32)
 		{
-			byte[] thumbnailData = [];
-
 			using ComPtr<IShellItemImageFactory> pShellItemImageFactory = default;
 			pShellItem->QueryInterface(IID.IID_IShellItemImageFactory, (void**)pShellItemImageFactory.GetAddressOf());
 			if (pShellItemImageFactory.IsNull)
@@ -69,7 +67,7 @@ namespace JumpListSample
 				return [];
 			}
 
-			if (!ConvertGpBitmapToByteArray(gpBitmap, out thumbnailData))
+			if (!ConvertGpBitmapToByteArray(gpBitmap, out var thumbnailData))
 			{
 				if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
 				return [];
@@ -83,38 +81,37 @@ namespace JumpListSample
 
 		public static byte[] GetThumbnail(IShellLinkW* pShellLink, int size = 32)
 		{
+			HRESULT hr = default;
 			int nIconIndex = 0;
 			char* pwszIconLocation = null;
-			HICON hIcon = default;
+			HICON hIconLarge = default;
+			HICON hIconSmall = default;
 			GpBitmap* pGpBitmap = null;
 
 			try
 			{
-				// Get the icon location and index
-				pwszIconLocation = (char*)NativeMemory.AllocZeroed(256);
-				pShellLink->GetIconLocation(pwszIconLocation, 256, &nIconIndex);
+				pwszIconLocation = (char*)NativeMemory.Alloc(256);
 
-				// Extract HICON from the icon location
-				hIcon = PInvoke.ExtractIcon(default, pwszIconLocation, (uint)nIconIndex);
-				if (hIcon.IsNull)
-					return [];
+				hr = pShellLink->GetIconLocation(pwszIconLocation, 256, &nIconIndex);
 
-				// Get the GpBitmap from the HICON
-				Status status = PInvoke.GdipCreateBitmapFromHICON(hIcon, &pGpBitmap);
-				if (status is not Status.Ok)
-					return [];
+				string path = new(pwszIconLocation);
 
-				// Convert the GpBitmap to a byte array
-				if (!ConvertGpBitmapToByteArray(pGpBitmap, out var data) || data is null)
-					return [];
+				using ComPtr<IExtractIconW> pExtractIcon = default;
+				pShellLink->QueryInterface(IID.IID_IExtractIconW, (void**)pExtractIcon.GetAddressOf());
+				hr = pExtractIcon.Get()->Extract(pwszIconLocation, (uint)nIconIndex, &hIconLarge, &hIconSmall, (uint)size);
 
-				return data;
+				var bitmap = System.Drawing.Bitmap.FromHicon(hIconSmall);
+				using var ms = new MemoryStream();
+				bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+
+				return ms.ToArray();
 			}
 			finally
 			{
-				NativeMemory.Free(pwszIconLocation);
-				PInvoke.DestroyIcon(hIcon);
-				PInvoke.GdipDisposeImage((GpImage*)pGpBitmap);
+				if (pwszIconLocation is not null) NativeMemory.Free(pwszIconLocation);
+				if (!hIconLarge.IsNull) PInvoke.DestroyIcon(hIconLarge);
+				if (!hIconSmall.IsNull) PInvoke.DestroyIcon(hIconSmall);
+				if (pGpBitmap is not null) PInvoke.GdipDisposeImage((GpImage*)pGpBitmap);
 			}
 		}
 

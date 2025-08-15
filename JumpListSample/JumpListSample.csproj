@@ -37,6 +37,7 @@
 		<PackageReference Include="Dongle.GuidRVAGen" Version="1.0.5" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.8" />
 	</ItemGroup>
 
 </Project>

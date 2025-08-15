@@ -240,4 +240,8 @@ GdiplusShutdown
 IPropertyStore
 PKEY_Title
 SHLoadIndirectString
-ExtractIcon
+ExtractIconEx
+IExtractIconW
+IExtractImage
+LoadImage
+GetIconInfo
