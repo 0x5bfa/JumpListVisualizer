@@ -25,19 +25,26 @@
 				<TextBlock
 					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 					Style="{StaticResource CaptionTextBlockStyle}"
-					Text="{Binding Text}" />
+					Text="{Binding Text}"
+					TextTrimming="CharacterEllipsis"
+					TextWrapping="NoWrap" />
 			</Grid>
 		</DataTemplate>
 
 		<DataTemplate x:Key="JumpListItemTemplate" x:DataType="local:JumpListItem">
-			<Grid ColumnSpacing="12">
+			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="16" />
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<Image Source="{x:Bind Icon}" />
-				<TextBlock Grid.Column="1" Text="{Binding Text}" />
+				<TextBlock
+					Grid.Column="1"
+					Margin="12,0"
+					Text="{Binding Text}"
+					TextTrimming="CharacterEllipsis"
+					TextWrapping="NoWrap" />
 			</Grid>
 		</DataTemplate>
 

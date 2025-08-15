@@ -21,62 +21,56 @@ namespace JumpListSample
 
 		public static byte[]? GetThumbnail(IShellItem* pShellItem, int size = 32)
 		{
-			using ComPtr<IShellItemImageFactory> pShellItemImageFactory = default;
-			pShellItem->QueryInterface(IID.IID_IShellItemImageFactory, (void**)pShellItemImageFactory.GetAddressOf());
-			if (pShellItemImageFactory.IsNull)
-				return [];
-
-			// Get HBITMAP
 			HBITMAP hBitmap = default;
-			HRESULT hr = pShellItemImageFactory.Get()->GetImage(new(size, size), SIIGBF.SIIGBF_ICONONLY, &hBitmap);
-			if (hr.ThrowIfFailedOnDebug().Failed)
+			byte* flippedBits = null;
+
+			try
+			{
+				using ComPtr<IShellItemImageFactory> pShellItemImageFactory = default;
+				pShellItem->QueryInterface(IID.IID_IShellItemImageFactory, (void**)pShellItemImageFactory.GetAddressOf());
+				if (pShellItemImageFactory.IsNull)
+					return [];
+
+				// Get HBITMAP
+				HRESULT hr = pShellItemImageFactory.Get()->GetImage(new(size, size), SIIGBF.SIIGBF_ICONONLY, &hBitmap);
+				if (hr.ThrowIfFailedOnDebug().Failed)
+					return [];
+
+				// Retrieve BITMAP data
+				BITMAP bmp = default;
+				if (PInvoke.GetObject(hBitmap, sizeof(BITMAP), &bmp) is 0)
+					return [];
+
+				// Allocate buffer for flipped pixel data
+				flippedBits = (byte*)NativeMemory.AllocZeroed((nuint)(bmp.bmWidthBytes * bmp.bmHeight));
+
+				// Flip the image manually row by row
+				for (int y = 0; y < bmp.bmHeight; y++)
+				{
+					Buffer.MemoryCopy(
+						(byte*)bmp.bmBits + y * bmp.bmWidthBytes,
+						flippedBits + (bmp.bmHeight - y - 1) * bmp.bmWidthBytes,
+						bmp.bmWidthBytes,
+						bmp.bmWidthBytes
+					);
+				}
+
+				// Create GpBitmap from the flipped pixel data
+				GpBitmap* gpBitmap = default;
+				var status = PInvoke.GdipCreateBitmapFromScan0(bmp.bmWidth, bmp.bmHeight, bmp.bmWidthBytes, 2498570, flippedBits, &gpBitmap);
+				if (status is not Status.Ok)
+					return [];
+
+				if (!ConvertGpBitmapToByteArray(gpBitmap, out var thumbnailData))
+					return [];
+
+				return thumbnailData;
+			}
+			finally
 			{
 				if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
-				return [];
-			}
-
-			// Retrieve BITMAP data
-			BITMAP bmp = default;
-			if (PInvoke.GetObject(hBitmap, sizeof(BITMAP), &bmp) is 0)
-			{
-				if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
-				return [];
-			}
-
-			// Allocate buffer for flipped pixel data
-			byte* flippedBits = (byte*)NativeMemory.AllocZeroed((nuint)(bmp.bmWidthBytes * bmp.bmHeight));
-
-			// Flip the image manually row by row
-			for (int y = 0; y < bmp.bmHeight; y++)
-			{
-				Buffer.MemoryCopy(
-					(byte*)bmp.bmBits + y * bmp.bmWidthBytes,
-					flippedBits + (bmp.bmHeight - y - 1) * bmp.bmWidthBytes,
-					bmp.bmWidthBytes,
-					bmp.bmWidthBytes
-				);
-			}
-
-			// Create GpBitmap from the flipped pixel data
-			GpBitmap* gpBitmap = default;
-			var status = PInvoke.GdipCreateBitmapFromScan0(bmp.bmWidth, bmp.bmHeight, bmp.bmWidthBytes, 2498570, flippedBits, &gpBitmap);
-			if (status is not Status.Ok)
-			{
 				if (flippedBits is not null) NativeMemory.Free(flippedBits);
-				if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
-				return [];
 			}
-
-			if (!ConvertGpBitmapToByteArray(gpBitmap, out var thumbnailData))
-			{
-				if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
-				return [];
-			}
-
-			if (flippedBits is not null) NativeMemory.Free(flippedBits);
-			if (!hBitmap.IsNull) PInvoke.DeleteObject(hBitmap);
-
-			return thumbnailData;
 		}
 
 		public static byte[] GetThumbnail(IShellLinkW* pShellLink, int size = 32)
@@ -100,7 +94,12 @@ namespace JumpListSample
 				pShellLink->QueryInterface(IID.IID_IExtractIconW, (void**)pExtractIcon.GetAddressOf());
 				hr = pExtractIcon.Get()->Extract(pwszIconLocation, (uint)nIconIndex, &hIconLarge, &hIconSmall, (uint)size);
 
-				var bitmap = System.Drawing.Bitmap.FromHicon(hIconSmall);
+				// Use GDI+ to convert the icon to a bitmap with alpha mask
+				using var icon = System.Drawing.Icon.FromHandle(hIconLarge);
+				using var bitmap = new System.Drawing.Bitmap(32, 32, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				using var g = System.Drawing.Graphics.FromImage(bitmap);
+				g.Clear(System.Drawing.Color.Transparent);
+				g.DrawIcon(icon, 0, 0);
 				using var ms = new MemoryStream();
 				bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
 
