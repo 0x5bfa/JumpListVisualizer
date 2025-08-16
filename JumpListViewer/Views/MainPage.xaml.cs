@@ -1,6 +1,7 @@
 // Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT License.
 
+using JumpListViewer.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 
 namespace JumpListViewer.Views

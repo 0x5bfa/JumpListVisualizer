@@ -16,7 +16,7 @@ using Windows.Win32.System.SystemServices;
 using Windows.Win32.UI.Shell;
 using Windows.Win32.UI.Shell.PropertiesSystem;
 
-namespace JumpListViewer
+namespace JumpListViewer.ViewModels
 {
 	public unsafe class MainPageViewModel
 	{
@@ -79,9 +79,18 @@ namespace JumpListViewer
 
 			var amuid = ApplicationItems.ElementAt(SelectedIndexOfApplicationItems).AppUserModelID;
 
-			if (string.IsNullOrEmpty(amuid) || JumpListManager.Initialize(amuid) is not { } manager)
-				return;
+			if (JumpListManager.Create(amuid) is not { } manager)
+				throw new InvalidOperationException($"Failed to initialize {nameof(JumpListManager)}.");
 
+			InsertAutomaticDestinationItems(manager);
+			InsertCustomDestinationItems(manager);
+			InsertTaskItems(manager);
+
+			manager.Dispose();
+		}
+
+		private void InsertAutomaticDestinationItems(JumpListManager manager)
+		{
 			if (manager.HasAutomaticDestinationsOf(DESTLISTTYPE.PINNED))
 			{
 				JumpListItems.Add(new JumpListSectionItem() { Text = "Pinned" });
@@ -101,13 +110,24 @@ namespace JumpListViewer
 					JumpListItems.Add(item);
 				}
 			}
+		}
 
+		private void InsertCustomDestinationItems(JumpListManager manager)
+		{
 			foreach (var item in manager.EnumerateCustomDestinations())
 			{
 				JumpListItems.Add(item);
 			}
+		}
 
-			manager.Dispose();
+		private void InsertTaskItems(JumpListManager manager)
+		{
+			JumpListItems.Add(new JumpListSectionItem() { Text = "Tasks" });
+
+			foreach (var item in manager.EnumerateTasks())
+			{
+				JumpListItems.Add(item);
+			}
 		}
 	}
 }

@@ -22,8 +22,11 @@ namespace JumpListViewer.Utilities
 		ICustomDestinationList* _customDestListPtr = default;
 		ICustomDestinationList2* _customDestList2Ptr = default;
 
-		public static JumpListManager Initialize(string szAppId)
+		public static JumpListManager? Create(string? szAppId)
 		{
+			if (string.IsNullOrEmpty(szAppId))
+				return null;
+
 			HRESULT hr = default;
 
 			IAutomaticDestinationList* autoDestListPtr = default;
@@ -89,21 +92,20 @@ namespace JumpListViewer.Utilities
 				APPDESTCATEGORY category = default;
 				char* pszCategoryName = null;
 
+				// Get the category data (e.g., the type, the name, and the count of the destinations)
+				hr = _customDestList2Ptr->GetCategory(dwCategoryIndex, GETCATFLAG.DEFAULT, &category).ThrowOnFailure();
+
+				if (category.Type is not APPDESTCATEGORYTYPE.CUSTOM)
+					continue;
+
 				try
 				{
-					// Get the category data (e.g., the type, the name, and the count of the destinations)
-					hr = _customDestList2Ptr->GetCategory(dwCategoryIndex, GETCATFLAG.DEFAULT, &category).ThrowOnFailure();
-
-					if (category.Type is APPDESTCATEGORYTYPE.STANDARD)
-						continue;
-
 					// Get the category name
 					pszCategoryName = (char*)NativeMemory.AllocZeroed(256);
 					PInvoke.SHLoadIndirectString(category.Anonymous.Name, pszCategoryName, 256, null);
-					string categoryName = category.Type is APPDESTCATEGORYTYPE.TASKS ? "Tasks" : new(pszCategoryName);
 
 					// Add the category header item
-					items.Add(new JumpListSectionItem() { Text = categoryName });
+					items.Add(new JumpListSectionItem() { Text = new(pszCategoryName) });
 
 					// Enumerate and add the destinations in the category to the list
 					using ComPtr<IObjectCollection> pObjectCollection = default;
@@ -113,7 +115,48 @@ namespace JumpListViewer.Utilities
 				finally
 				{
 					if (pszCategoryName is not null) NativeMemory.Free(pszCategoryName);
-					if (category.Anonymous.Name.Value is not null && category.Type is not APPDESTCATEGORYTYPE.STANDARD) PInvoke.CoTaskMemFree(category.Anonymous.Name);
+					if (category.Anonymous.Name.Value is not null) PInvoke.CoTaskMemFree(category.Anonymous.Name);
+				}
+			}
+
+			return items;
+		}
+
+		public IEnumerable<BaseJumpListItem> EnumerateTasks()
+		{
+			HRESULT hr = default;
+
+			uint dwCategoryCount = 0U;
+			hr = _customDestList2Ptr->GetCategoryCount(&dwCategoryCount);
+
+			List<BaseJumpListItem> items = [];
+
+			for (uint dwCategoryIndex = 0U; dwCategoryIndex < dwCategoryCount; dwCategoryIndex++)
+			{
+				APPDESTCATEGORY category = default;
+				char* pszCategoryName = null;
+
+				// Get the category data (e.g., the type, the name, and the count of the destinations)
+				hr = _customDestList2Ptr->GetCategory(dwCategoryIndex, GETCATFLAG.DEFAULT, &category).ThrowOnFailure();
+
+				if (category.Type is not APPDESTCATEGORYTYPE.TASKS)
+					continue;
+
+				try
+				{
+					// Get the category name
+					pszCategoryName = (char*)NativeMemory.AllocZeroed(256);
+					PInvoke.SHLoadIndirectString(category.Anonymous.Name, pszCategoryName, 256, null);
+
+					// Enumerate and add the destinations in the category to the list
+					using ComPtr<IObjectCollection> pObjectCollection = default;
+					hr = _customDestList2Ptr->EnumerateCategoryDestinations(dwCategoryIndex, IID.IID_IObjectCollection, (void**)pObjectCollection.GetAddressOf()).ThrowOnFailure();
+					items.AddRange(CreateCollectionFromIObjectCollection(pObjectCollection.Get()));
+				}
+				finally
+				{
+					if (pszCategoryName is not null) NativeMemory.Free(pszCategoryName);
+					if (category.Anonymous.Name.Value is not null) PInvoke.CoTaskMemFree(category.Anonymous.Name);
 				}
 			}
 
