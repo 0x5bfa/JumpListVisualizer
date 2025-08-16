@@ -11,8 +11,6 @@
 
 	<Page.Resources>
 
-		<x:Double x:Key="ListViewItemMinHeight">32</x:Double>
-
 		<wctconverters:EmptyCollectionToObjectConverter
 			x:Key="EmptyCollectionToNegateVisibilityConverter"
 			EmptyValue="Visible"
@@ -24,10 +22,9 @@
 			SectionItem="{StaticResource JumpListSectionItemTemplate}" />
 
 		<DataTemplate x:Key="JumpListSectionItemTemplate" x:DataType="data:JumpListSectionItem">
-			<Grid Margin="12,7,12,6" ColumnSpacing="8">
+			<Grid Margin="12,8">
 				<TextBlock
-					Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-					Style="{StaticResource CaptionTextBlockStyle}"
+					Style="{StaticResource SubtitleTextBlockStyle}"
 					Text="{Binding Text}"
 					TextTrimming="CharacterEllipsis"
 					TextWrapping="NoWrap" />
@@ -35,7 +32,7 @@
 		</DataTemplate>
 
 		<DataTemplate x:Key="JumpListItemTemplate" x:DataType="data:JumpListItem">
-			<Grid Margin="12,7,24,6">
+			<Grid Margin="12,8">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="16" />
 					<ColumnDefinition Width="*" />
@@ -76,7 +73,7 @@
 				x:Name="ApplicationItemsListView"
 				Grid.Column="0"
 				Width="300"
-				Padding="8,12"
+				Padding="8,0,8,12"
 				ItemsSource="{x:Bind ViewModel.ApplicationItems}"
 				SelectedIndex="{x:Bind ViewModel.SelectedIndexOfApplicationItems, Mode=TwoWay}"
 				SelectionChanged="ApplicationItemsListView_SelectionChanged">
@@ -121,16 +118,12 @@
 
 			<ScrollView
 				Grid.Column="1"
-				Height="600"
-				MaxWidth="300"
-				MaxHeight="600"
-				Padding="0,0"
 				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
 				BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-				BorderThickness="1"
-				CornerRadius="{StaticResource OverlayCornerRadius}">
+				BorderThickness="1,1,0,0"
+				CornerRadius="8,0,0,0">
 
-				<Grid>
+				<Grid Margin="36">
 
 					<TextBlock
 						x:Name="NoJumpListAvailableTextBlock"
@@ -139,10 +132,14 @@
 						Text="No jump list available"
 						Visibility="{x:Bind ViewModel.JumpListItems, Converter={StaticResource EmptyCollectionToNegateVisibilityConverter}, Mode=OneWay}" />
 
-					<ItemsControl
-						x:Name="JumpListItemsControl"
-						ItemTemplateSelector="{StaticResource JumpListItemTemplateSelector}"
-						ItemsSource="{x:Bind ViewModel.JumpListItems, Mode=OneWay}" />
+					<StackPanel>
+
+						<ItemsControl
+							x:Name="JumpListItemsControl"
+							ItemTemplateSelector="{StaticResource JumpListItemTemplateSelector}"
+							ItemsSource="{x:Bind ViewModel.JumpListItems, Mode=OneWay}" />
+
+					</StackPanel>
 
 				</Grid>
 			</ScrollView>
